@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FC26 — Guía de Mecánicas</title>
+<style>
+:root {
+  --bg: #0f1014;
+  --surface: #16181f;
+  --surface2: #1e2028;
+  --surface3: #252830;
+  --border: #2c2f3a;
+  --border2: #3a3e4e;
+  --accent: #3b82f6;
+  --accent-dim: #1e3a5f;
+  --accent-text: #93c5fd;
+  --text: #e2e4ec;
+  --text2: #8b90a8;
+  --text3: #4a4f66;
+  --red: #f87171;
+  --warn: #f59e0b;
+  --warn-dim: #2a1e0a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; }
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar { width: 196px; min-width: 196px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+.sidebar-logo { padding: 0 18px 18px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+.sidebar-logo .t { font-size: 18px; font-weight: 800; color: var(--accent-text); letter-spacing: -0.5px; }
+.sidebar-logo .s { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+.nav-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); padding: 8px 18px 4px; }
+.nav-btn { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: none; border-left: 2px solid transparent; color: var(--text2); font-size: 13px; padding: 7px 18px; cursor: pointer; text-align: left; transition: all 0.12s; }
+.nav-btn:hover { color: var(--text); background: var(--surface2); }
+.nav-btn.active { color: var(--accent-text); border-left-color: var(--accent); background: var(--surface2); }
+.nav-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.4; flex-shrink: 0; }
+
+.main { flex: 1; padding: 28px 28px 80px; min-width: 0; }
+.topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+.search-wrap { position: relative; flex: 1; max-width: 300px; }
+.search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; padding: 7px 12px 7px 30px; outline: none; transition: border-color 0.15s; }
+.search-wrap input:focus { border-color: var(--accent); }
+.search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; pointer-events: none; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; color: var(--text2); font-size: 12px; padding: 4px 12px; cursor: pointer; transition: all 0.12s; white-space: nowrap; }
+.filter-btn:hover { color: var(--text); border-color: var(--border2); }
+.filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent-text); }
+
+.section-wrap { margin-bottom: 8px; }
+.section-wrap.hidden { display: none; }
+.section-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; margin-top: 32px; }
+.section-header:first-of-type { margin-top: 0; }
+.sec-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 600; }
+.sec-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.section-note { font-size: 12px; color: var(--text2); background: var(--surface); border-left: 2px solid var(--accent); padding: 8px 12px; border-radius: 0 4px 4px 0; margin-bottom: 14px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-bottom: 6px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.12s, transform 0.1s; user-select: none; }
+.card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.card-top { padding: 12px 13px 0; }
+.card-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 8px; }
+.card-buttons { display: flex; flex-wrap: wrap; gap: 4px; padding-bottom: 12px; }
+.btn-pill { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-size: 11px; font-weight: 600; padding: 2px 7px; font-family: 'Consolas', monospace; white-space: nowrap; }
+.btn-sep { color: var(--text3); font-size: 11px; padding: 2px 0; align-self: center; }
+.card-meta { display: flex; align-items: center; gap: 6px; padding: 8px 13px; border-top: 1px solid var(--border); }
+.card-section-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); flex: 1; }
+.card-skill { font-size: 10px; padding: 1px 6px; border-radius: 3px; white-space: nowrap; }
+.skill-req { background: var(--warn-dim); border: 1px solid var(--warn); color: var(--warn); }
+.skill-no { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent-text); }
+.card-arrow { color: var(--text3); font-size: 11px; }
+.no-results { display: none; color: var(--text3); font-size: 14px; padding: 40px 0; text-align: center; }
+.no-results.visible { display: block; }
+
+/* POPUP */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+.overlay.open { display: flex; }
+.popup { background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.7); animation: popIn 0.14s ease; }
+@keyframes popIn { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.popup-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px; }
+.popup-title-wrap { flex: 1; }
+.popup-name { font-size: 17px; font-weight: 700; color: var(--text); }
+.popup-section { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); margin-top: 3px; }
+.popup-close { background: var(--surface3); border: 1px solid var(--border); border-radius: 6px; color: var(--text2); font-size: 16px; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: color 0.1s; }
+.popup-close:hover { color: var(--text); }
+.popup-buttons { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.popup-btn-pill { background: var(--accent-dim); border: 1px solid var(--accent); border-radius: 5px; color: var(--accent-text); font-size: 13px; font-weight: 700; padding: 4px 10px; font-family: 'Consolas', monospace; white-space: nowrap; }
+.popup-btn-sep { color: var(--text3); font-size: 13px; padding: 0 2px; }
+.popup-body { padding: 4px 0; }
+.popup-row { display: grid; grid-template-columns: 100px 1fr; gap: 4px 12px; padding: 11px 20px; border-bottom: 1px solid var(--border); }
+.popup-row:last-child { border-bottom: none; }
+.popup-row-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); padding-top: 2px; line-height: 1.4; }
+.popup-row-value { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.popup-no { color: var(--red); font-size: 13px; line-height: 1.6; }
+.popup-video { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.popup-video-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 8px; }
+.popup-video iframe { width: 100%; height: 200px; border-radius: 6px; border: none; display: block; }
+.popup-video-placeholder { display: flex; align-items: center; gap: 8px; background: var(--surface3); border: 1px dashed var(--border2); border-radius: 6px; padding: 12px 14px; color: var(--text3); font-size: 12px; }
+.popup-video-link { display: inline-flex; align-items: center; gap: 5px; background: var(--accent-dim); border: 1px solid var(--accent); border-radius: 5px; color: var(--accent-text); font-size: 12px; font-weight: 600; padding: 5px 10px; text-decoration: none; margin-top: 8px; }
+.popup-video-link:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="t">FC26</div><div class="s">PS5 · Mecánicas</div></div>
+  <div class="nav-lbl">Secciones</div>
+  <button class="nav-btn active" onclick="filterSection('all',this)"><span class="nav-dot"></span>Todo</button>
+  <button class="nav-btn" onclick="filterSection('defensa',this)"><span class="nav-dot"></span>Defensa</button>
+  <button class="nav-btn" onclick="filterSection('desmarques',this)"><span class="nav-dot"></span>Desmarques</button>
+  <button class="nav-btn" onclick="filterSection('pases',this)"><span class="nav-dot"></span>Pases</button>
+  <button class="nav-btn" onclick="filterSection('ataque',this)"><span class="nav-dot"></span>Ataque</button>
+  <button class="nav-btn" onclick="filterSection('regates',this)"><span class="nav-dot"></span>Regates</button>
+  <button class="nav-btn" onclick="filterSection('conduccion',this)"><span class="nav-dot"></span>Conducción</button>
+  <button class="nav-btn" onclick="filterSection('pelota',this)"><span class="nav-dot"></span>Pelota parada</button>
+  <button class="nav-btn" onclick="filterSection('patrones',this)"><span class="nav-dot"></span>Patrones</button>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="Buscar mecánica..." oninput="doSearch()"></div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterTag('all',this)">Todos</button>
+      <button class="filter-btn" onclick="filterTag('cuando',this)">Con cuándo NO</button>
+      <button class="filter-btn" onclick="filterTag('skill',this)">Requiere skill</button>
+      <button class="filter-btn" onclick="filterTag('noskill',this)">Sin skill</button>
+    </div>
+  </div>
+  <div id="noResults" class="no-results">No hay resultados.</div>
+  <div class="section-wrap" data-section="patrones">
+    <div class="section-header"><span class="sec-label">Táctica</span><span class="sec-title">Patrones de ataque</span></div>
+    <div class="section-note">Fuente: Deep Researcher FC · Los patrones son situaciones recurrentes de partido. Reconocerlos antes que el rival es la diferencia entre reaccionar y anticipar.</div>
+    <div class="cards" id="cards-patrones"></div>
+  </div>
+  <div class="section-wrap" data-section="defensa">
+    <div class="section-header"><span class="sec-label">Defensa</span><span class="sec-title">Mecánicas defensivas</span></div>
+    <div class="section-note">Centrales quietos en el centro siempre. Defender con medios, laterales y delanteros que bajan. MCDs se posicionan más atrás que MCs. Profundidad táctica mínima 65.</div>
+    <div class="cards" id="cards-defensa"></div>
+  </div>
+  <div class="section-wrap" data-section="desmarques">
+    <div class="section-header"><span class="sec-label">Ataque</span><span class="sec-title">Desmarques</span></div>
+    <div class="cards" id="cards-desmarques"></div>
+  </div>
+  <div class="section-wrap" data-section="pases">
+    <div class="section-header"><span class="sec-label">Ataque</span><span class="sec-title">Pases</span></div>
+    <div class="cards" id="cards-pases"></div>
+  </div>
+  <div class="section-wrap" data-section="ataque">
+    <div class="section-header"><span class="sec-label">Ataque</span><span class="sec-title">Conceptos y tiros</span></div>
+    <div class="cards" id="cards-ataque"></div>
+  </div>
+  <div class="section-wrap" data-section="regates">
+    <div class="section-header"><span class="sec-label">Ataque</span><span class="sec-title">Regates</span></div>
+    <div class="cards" id="cards-regates"></div>
+  </div>
+  <div class="section-wrap" data-section="conduccion">
+    <div class="section-header"><span class="sec-label">Ataque</span><span class="sec-title">Movimiento y conducción</span></div>
+    <div class="cards" id="cards-conduccion"></div>
+  </div>
+  <div class="section-wrap" data-section="pelota">
+    <div class="section-header"><span class="sec-label">Pelota parada</span><span class="sec-title">Corners, faltas y saques</span></div>
+    <div class="cards" id="cards-pelota"></div>
+  </div>
+</main>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePopup(event)">
+  <div class="popup" id="popup">
+    <div class="popup-header">
+      <div class="popup-title-wrap"><div class="popup-name" id="popupName"></div><div class="popup-section" id="popupSection"></div></div>
+      <button class="popup-close" onclick="closePopupBtn()">✕</button>
+    </div>
+    <div class="popup-buttons" id="popupButtons"></div>
+    <div id="popupVideo"></div>
+    <div class="popup-body" id="popupBody"></div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  defensa: [
+    { name:'Entrada (pie)', buttons:['Circulo'], cuando:'Rival de frente y muy cerca, balón despegado', no:'Rival en carrera o de espaldas → animación lenta, te deja fuera si fallas' },
+    { name:'Bruiser (cuerpo)', buttons:['Cruz','(spam)'], cuando:'Rival en carrera o de espaldas', no:'Rival de frente → le traspasas' },
+    { name:'Fuera de juego', buttons:['↑↑'], cuando:'Rival de espaldas o pasa hacia atrás, equipo muy hundido. Hacerlo siempre manual, el automático no es fiable', no:'Rival atacando de frente → gol seguro' },
+    { name:'Doble presión', buttons:['R1'], cuando:'Banda, mediocampo, área propia. Con medios/laterales. L1 mientras activa para cambiar al jugador que presiona y robar directamente', no:'Con centrales fuera del área → boquete enorme. Gasta stamina' },
+    { name:'Presión de equipo', buttons:['↑','←'], cuando:'Ataque por banda cerca del área, línea de fondo, corners en corto', no:'Mediocampo o campo propio → desordena el bloque sin necesidad' },
+    { name:'Lateral (posicionamiento)', buttons:['RS selecciona','→ cerrar'], cuando:'Cerrar espacio lateral-central con el lateral, no con el central', no:'Usar el central para cubrir la banda → deja hueco en el medio' },
+    { name:'Cambio de cursor manual', buttons:['RS → jugador'], cuando:'Seleccionar exactamente quién quieres: seguir desmarques, tapar líneas de pase, cerrar lateral. Configurar en ajustes: "referencia al futbolista"', no:'Cambio automático con L1 → siempre coge al más cercano, no al más útil' },
+    { name:'Seguir desmarques', buttons:['RS → defensa'], cuando:'Seguir solo el desmarque más peligroso con el defensa correspondiente. No seguir todos a la vez', no:'No pasar del área propia al seguirlos → rompes la línea' },
+    { name:'Jockey', buttons:['L2'], cuando:'Espejear al rival a velocidad controlada, esperar el momento para interceptar sin comprometerse', no:'Solo → lento, puede no llegar al atacante rápido en carrera' },
+    { name:'Sprint jockey', buttons:['L2','R2'], cuando:'Rival acelerando o en carrera — más rápido que jockey normal para seguirle el ritmo', no:'No abusar: pierde posicionamiento si el rival cambia de dirección bruscamente' },
+    { name:'L2 para bregar', buttons:['L2','(mantener)'], cuando:'Defender con medios/laterales, esperar momento para interceptar', no:'' },
+    { name:'Mover portero', buttons:['RS → lado'], cuando:'1v1, justo cuando va a tirar → pequeño paso que aumenta probabilidad de parar', no:'Moverlo demasiado pronto → se queda clavado fuera de posición y es gol seguro' },
+    { name:'Mover portero al palo largo', buttons:['Triangulo x2'], cuando:'Mover al portero rápidamente al palo cruzado ante tiro inminente', no:'Mismo riesgo: no antes de que tire' },
+    { name:'Corner defensivo — asignaciones', buttons:['Tácticas → Asignaciones'], cuando:'Jugadores sin aerial al poste cercano + guardaposte + marcador de amenaza. Los buenos por aire (PlayStyle aerial) libres para disputar el balón. Circulo para despejar', no:'' },
+  ],
+  desmarques: [
+    { name:'Desmarque al espacio', buttons:['LS → jugador','L1'], cuando:'Corre en línea recta al espacio. Levanta el brazo de confirmación. Puedes activar varios a la vez', situacion:'Espalda a laterales, banda, entre central-lateral' },
+    { name:'Desmarque doble simultáneo', buttons:['LS+L1','LS+L1','(×2)'], cuando:'Dos jugadores corriendo a la vez. Si se paran, repetir L1. Rival no sabe a cuál tapar', situacion:'Extremos de banda, contras' },
+    { name:'Desmarque dirigido', buttons:['L1','→ RS (toque, no mantener)'], cuando:'Cambia la trayectoria del run en diagonal. Volver a pulsar L1 para redirigir de nuevo. Tienes ~2-3s tras el L1 para hacerlo', situacion:'Entre central-lateral, diagonal, hacia atrás para recibir. Si el defensa sigue el run recto, mandarlo en diagonal' },
+    { name:'Desmarque de apoyo', buttons:['LS → jugador','R1'], cuando:'Llama al jugador a venir a recibir cerca (apoyo, no profundidad). Puedes llamar a dos pulsando dos veces', situacion:'Jugador lejos sin línea de pase, banda para recibir en corto' },
+    { name:'Pared (con balón)', buttons:['L1','Cruz'], cuando:'Desmarque al espacio del jugador que tiene el balón para hacer pared inmediata', situacion:'Laterales en banda, salida rápida en transición' },
+    { name:'Player Lock', buttons:['L3','R3','→ RS jugador'], cuando:'Control manual total del jugador off-ball. Puedes cambiar de jugador con RS sin salir del modo. Pase habitual: R1+Cruz. Pase al espacio: Triangulo', situacion:'Línea de fondo, entre centrales, corners. Requiere activar "Bloqueo de futbolista" en ajustes' },
+  ],
+  pases: [
+    { name:'Triangulo x2', buttons:['Triangulo','Triangulo'], cuando:'Borde del área, distancias cortas. Timing: justo cuando el jugador va a pasar la línea defensiva. No darlo antes → lo interceptan', notas:'Desmarcar receptor con L1 antes. Pasador necesita incisivo (al menos blanco). Bonus: el receptor que tira de bolea inmediata tras recibirlo no necesita playstyle de tiro', no:'' },
+    { name:'Triangulo de primeras', buttons:['Triangulo','(de primeras)'], cuando:'Triangulaciones rápidas con jugador desmarcado', notas:'Receptor desmarcado con L1. Pasador necesita tiki + incisivo (ambos en blanco bastan). Solo Triangulo, sin modificadores', no:'' },
+    { name:'Filtrado', buttons:['R1','Cruz'], cuando:'Filtrar al área desde MC o banda al delantero dentro del área. Controlar → girar → tirar. Variante picado: R1+Cruz+Cruz → sale elevado, más difícil de interceptar, útil a más distancia', notas:'Pase más fuerte, más difícil de interceptar. PlayStyle "Pinget Pass" ayuda pero no obligatorio', no:'' },
+    { name:'Con efecto', buttons:['L2','Triangulo'], cuando:'Cuando no miras al receptor (pase en diagonal hacia el lado contrario) → hace comba para rodear al defensa', notas:'Sin él el pase sale recto y lo corta la defensa. Si miras al receptor, Triangulo normal es suficiente', no:'' },
+    { name:'Player Lock + filtrado', buttons:['L3','R3','→ RS → R1+Cruz'], cuando:'Crear líneas de pase inexistentes. Corners, línea de fondo, delantero entre centrales', notas:'Pase al espacio dentro del player lock → usar Triangulo en vez de R1+Cruz', no:'' },
+    { name:'Cuadrado máx. potencia', buttons:['Cuadrado','(barra llena)'], cuando:'De banda a banda, lateral a extremo, saques de centro', notas:'Desmarcar antes al receptor de la banda contraria. Sin PlayStyle requerido', no:'' },
+    { name:'Manual', buttons:['R1','Triangulo'], cuando:'Ángulos difíciles, salida de balón con centrales/portero, evitar asistencia cuando la presión desvía el pase', notas:'No depende de animaciones. R1+Cuadrado si quieres darlo por arriba', no:'' },
+    { name:'L1+R1 en carrera', buttons:['L1','R1','→ RS arriba/abajo → Cruz/Triangulo'], cuando:'Emparejado con lateral/central en carrera, esquina del área, espacio central-lateral', notas:'Pegar el pase antes de que acabe la animación. Rival se suele pasar de frenada', no:'' },
+    { name:'L1+R1+Triangulo (profundidad)', buttons:['L1','R1','Triangulo'], cuando:'Mucho espacio a la espalda del rival, larga distancia, siempre va por dentro', notas:'Sale muy fuerte → necesitas mucho espacio. Triangulo normal a veces se va por fuera, este no', no:'' },
+    { name:'Centro potente', buttons:['L1','R1','Cuadrado x2','(o Circulo x2)'], cuando:'En carrera hacia línea de fondo con receptor desmarcado al otro palo', notas:'Teledirigido. Cuadrado x2 o Circulo x2 según tu configuración de centro', no:'' },
+    { name:'Tacón (L2 de primeras)', buttons:['L2','Cruz/Triangulo','(de primeras)'], cuando:'Paredes, triangulaciones rápidas, pases de espaldas', notas:'Sale más rápido y preciso que el pase normal de primeras. Confirmar que hace animación de tacón, a veces se gira', no:'' },
+    { name:'Directional nutmeg + pase', buttons:['L1','R1','→ RS lado → Cruz'], cuando:'En carrera por banda: toque lateral con RS en medio de la animación del L1+R1, luego pase al interior. Muy difícil de defender', notas:'Variante del L1+R1 en carrera orientada específicamente a crear líneas de pase al interior desde banda', no:'' },
+  ],
+  ataque: [
+    { name:'Sprint', buttons:['Sin sprint / R1'], cuando:'Extremo con espacio en banda, delantero que ya ganó la espalda', no:'Centro del campo, campo propio, dentro del área, al controlar un pase → toques largos, te roban más' },
+    { name:'Juego de primeras', buttons:['L1+Cruz','(pasar y desmarcar)'], cuando:'Campo rival, mediocampo apretado. L1+Cruz para pasar y que el pasador se desmarque a la vez', no:'Si tienes tiempo y mejor ángulo controlando, controla. Medir cuándo' },
+    { name:'Contras', buttons:['L1 extremos','→ Triangulo x2 al MCO'], cuando:'Al robar, desmarcar extremos con L1 de inmediato → cuando el extremo pasa la línea defensiva, Triangulo x2 al delantero/MCO', no:'Quedarse con posesión lenta → el rival se repliega y la CPU defiende muy bien en estático' },
+    { name:'Tiro de calidad', buttons:['R1','Triangulo x2'], cuando:'Dentro del área al punto de penalti, borde del área. Bonus: tras regate (ruleta diagonal, Magici Cancel, balroll, pisadita) el tiro sale con boost añadido', notas:'Orientar el cuerpo en diagonal hacia el palo largo antes de tirar. Potencia: ~2,5-3 barras', no:'Sin orientación previa → sale centrado. Quedarse corto de potencia → tiro centrado, portero lo coge fácil' },
+    { name:'Tiro de calidad raso', buttons:['R1','Circulo','Circulo'], cuando:'Desde punto de penalti hacia atrás, 1v1 con portero saliendo — buguea al portero', notas:'Primero potencia, segundo activa raso. Orientar al palo largo antes de tirar', no:'Sin orientación → sale centrado' },
+    { name:'Tiro raso', buttons:['Circulo x2'], cuando:'Dentro del área, cerca del portero, cuando tienes espacio para elegir palo', notas:'Primero potencia, segundo activa raso', no:'Fuera del área → no va bien este año' },
+    { name:'Tiro colocado (rosca)', buttons:['Triangulo x2','(corriendo en diagonal)'], cuando:'Corriendo en diagonal, cerca o media distancia dentro del área. Orientado al palo largo', no:'Fuera del área' },
+    { name:'Tiro potente raso', buttons:['L1','R1','Circulo x2'], cuando:'Jugadores con PlayStyle power shot o barra que carga rápido', no:'Sin orientación → sale mal' },
+    { name:'Trivela', buttons:['L2','Triangulo x2','(orientado al 1er palo)'], cuando:'Vas en carrera hacia el primer palo sin tiempo de reorientarte para el tiro de calidad', notas:'Requiere PlayStyle Game Changer', no:'Jugador sin Game Changer' },
+    { name:'Ángulos de tiro por pie', buttons:['—'], cuando:'Pie natural en su lado (zurdo izquierda, diestro derecha) → tiro normal o raso al palo cercano. Pie no natural en lado contrario → finesse al palo largo. Desde el centro: palo cercano=raso, palo lejano=finesse', notas:'Balroll antes del tiro para abrir el cuerpo al ángulo correcto según el pie del jugador', no:'' },
+    { name:'Línea de fondo', buttons:['Opción A','Opción B: Player Lock'], cuando:'Llegues a línea de fondo sin ideas o con presión de equipo encima. Opción A: sacar atrás al medio → filtrar al delantero/extremo dentro del área → tiro. Opción B: player lock al delantero, tirarlo hacia atrás, orientar al palo largo, tiro de calidad', no:'Dar vueltas sin decidir → te activan la presión y pierdes el balón' },
+    { name:'Desmarque lateral', buttons:['L1 al lateral','→ Triangulo x2'], cuando:'Lateral subiendo por sorpresa desde atrás, rival con toda la defensa arriba. L1 cuando sube, Triangulo x2 cuando va a pasar la línea defensiva', no:'' },
+    { name:'Corners en corto (ataque)', buttons:['2v1 en banda'], cuando:'La defensa se descoloca mucho en corners cortos. Hacer 2v1 en banda → meter el balón al área → tiro raso, pase rápido o centro al segundo palo', no:'Rival activa presión de equipo → usar corner con player lock' },
+  ],
+  regates: [
+    { name:'Ruleta diagonal', buttons:['Suelta sprint','L2+R1','→ RS semicírculo'], cuando:'Rival emparejado en carrera, va a meterte cuerpo. Salida arriba o abajo según dirección del semicírculo', skill:'4+', no:'' },
+    { name:'Pisadita', buttons:['L1+R1','→ RS recto'], cuando:'Rival emparejado en carrera. Borde del área para tiro de calidad inmediato. RS recto (nunca diagonal). Si vas en diagonal, RS también en diagonal. Variante: Cruz antes de acabar para cancelar y abrir línea de pase', skill:'—', no:'' },
+    { name:'Magici Cancel', buttons:['RS → donde miras','RS → donde salir','→ L2+R2+LS'], cuando:'Borde del área, zona central. Buscar línea de tiro o pase. RS donde miras → RS donde salir → antes de acabar: L2+R2+LS hacia donde salir', skill:'4 (Verb Spin) / 5 (Magici)', no:'' },
+    { name:'Parante-atrás L1', buttons:['Mantén L1','→ RS adelante-atrás'], cuando:'Entre central y lateral, o portero saliendo encima', skill:'4+', no:'' },
+    { name:'Elástica inversa', buttons:['RS semicírculo','(en sonrisa)'], cuando:'Mirando a banda, necesitas girarte a portería rápido. RS semicírculo "en sonrisa" desde espalda del jugador', skill:'5', no:'' },
+    { name:'Elástica normal', buttons:['RS semicírculo','(de dentro a fuera)'], cuando:'De cara al rival, 1v1, fintar a un lado y salir al otro', skill:'5', no:'' },
+    { name:'Balroll + Cola de vaca', buttons:['RS balroll','→ RS cola de vaca','→ LS salida'], cuando:'En banda para girar y resetear, o amagar tiro en área', skill:'5', no:'' },
+    { name:'Bicicleta con L1', buttons:['L1','RS semicírculo','→ LS salida'], cuando:'Cerca del área cuando el rival está muy cerrado y no encuentras hueco', skill:'3+', no:'' },
+    { name:'Balroll', buttons:['RS → lado','(mantener)'], cuando:'Abrir ángulo de tiro o esquivar portero. Usar antes de tiro de calidad para orientar el cuerpo', skill:'—', no:'' },
+    { name:'Croqueta tiro', buttons:['L1','RS → lado','→ tiro antes de acabar animación'], cuando:'Sin ángulo en línea de fondo, o cuando no hay espacio. Tiro normal (no calidad) sale más fuerte', skill:'—', no:'' },
+    { name:'Croqueta cancel', buttons:['Mantén L1','RS → lado','→ L2+R2'], cuando:'Cancelar la croqueta y salir en otra dirección. Muy rápido de dedos', skill:'—', no:'' },
+  ],
+  conduccion: [
+    { name:'Tipos de aceleración', buttons:['—'], cuando:'Explosive: arranca rápido, se frena a larga distancia. Controlled: equilibrado, bueno en la mayoría de posiciones. Lengthy: arranca lento pero a distancia larga es imparable → buscar en extremos y laterales', notas:'Se puede cambiar con el estilo de química (ej. Sniper)', no:'' },
+    { name:'Giro solo con LS', buttons:['LS → dirección'], cuando:'Dentro del área, mediocampo, línea de fondo', notas:'Espera a que acabe la animación antes de volver a girar o el jugador se bloquea', no:'' },
+    { name:'L2 + LS', buttons:['L2','→ LS'], cuando:'Defensa muy pegado en la espalda, recibir de espaldas', notas:'Primero cubres el balón con L2, luego giras solo con LS', no:'' },
+    { name:'Sprint analógico', buttons:['R2','al 70-80%'], cuando:'Romper líneas, meterse entre central y lateral, conducción rápida con balón muy pegado', notas:'Activar en ajustes del mando. Solo funciona con R2, no con R1. Activa el playstyle Rapid', no:'' },
+    { name:'Sprint controlado R1', buttons:['LS giro','→ R1 diagonal'], cuando:'Delantero de espaldas que recibe y quiere girarse hacia portería', notas:'No usar R1 para girar, solo para acelerar una vez orientado. Suelta R1 justo antes del tiro raso', no:'' },
+    { name:'Doble R2 (máxima velocidad)', buttons:['R2 x2','→ toque largo controlado'], cuando:'Autopista delante, mucho espacio libre', no:'No hacerlo con rivales cerca o en el área → pierde el control' },
+    { name:'R2 por toque (Rapid)', buttons:['R2','(al contacto)','→ soltar → repetir'], cuando:'Rival cerca en carrera, espacio moderado', notas:'Requiere PlayStyle Rapid al menos en blanco. Más rápido que mantener R2 continuo', no:'' },
+    { name:'Balroll + amago de tiro', buttons:['RS balroll','→ Cuadrado/Circulo+Cruz'], cuando:'Girarse cambiando de dirección cuando el defensa está cerca. RS hacia un lado (balroll) → amago de tiro en diagonal', notas:'El balroll aleja el balón del rival, el amago completa el giro', no:'' },
+  ],
+  pelota: [
+    { name:'Corner ofensivo — player lock', buttons:['L3+R3','→ RS jugador','→ desmarcar al área'], cuando:'Jugador más alto con aerial al 2º palo. Puntero al portero casi a tope de potencia. Player lock justo al salir el balón del pie → RS selecciona frontal del área → mandarlo al espacio libre', notas:'Variante: asignar jugador con buen tiro al top del área, cabecear hacia él con el del 2º palo y hacer player lock para disparar desde fuera', no:'' },
+    { name:'Corner corto (ofensivo)', buttons:['2v1 en banda'], cuando:'La defensa se descoloca mucho en corners cortos. Hacer 2v1 en banda → meter el balón al área → tiro raso, pase rápido o centro al segundo palo', no:'Rival activa presión de equipo → usar corner con player lock' },
+    { name:'Corner defensivo — asignaciones', buttons:['Tácticas → Asignaciones'], cuando:'Jugadores sin aerial → poste cercano + guardaposte + marcador de amenaza. Los buenos por aire (PlayStyle aerial) quedan libres para disputar el balón. Circulo para despejar', no:'' },
+    { name:'Tiro libre — default', buttons:['RS todo a la izquierda','(curled)','3 barras'], cuando:'Rival no hace nada. Apuntar entre barrera y portero. RS completamente a la izquierda hasta que cambie de "low" a "curled", mantener en curled. 3 barras de potencia', no:'' },
+    { name:'Tiro libre — rival mueve portero a la barrera', buttons:['Interior del pie','3 barras'], cuando:'Apuntar fuera de la barrera para que el balón curve alrededor del exterior. El portero se alejó del palo → ese espacio queda libre', no:'' },
+    { name:'Tiro libre — rival mueve la barrera', buttons:['RS curled','3 barras'], cuando:'Mismo trivela pero apuntar al palo del portero que ha quedado libre al mover la barrera', no:'' },
+    { name:'Tiro libre — ángulo contrario', buttons:['Interior del pie','entre barrera y portero'], cuando:'Falta en el lado contrario al pie dominante. Misma mecánica adaptada al ángulo', notas:'Clave general: leer qué hace el rival y responder con la variante contraria. No elegir siempre la misma', no:'' },
+    { name:'Saque de banda', buttons:['RS → receptor','→ moverlo'], cuando:'Seleccionar el receptor con RS antes de lanzar. Moverlo para crear espacio: amagar en profundidad y volver, o viceversa, generando desmarque en el momento del saque', no:'' },
+  ]
+};
+
+let activeSection='all', activeTag='all', searchText='';
+
+function sepBtns(buttons,pfx='popup') {
+  return buttons.map(b=>{
+    const isSep=b.startsWith('(')||b.startsWith('→')||b==='×2'||b==='—';
+    return `<span class="${pfx}-btn-${isSep?'sep':'pill'}">${b}</span>`;
+  }).join('');
+}
+function cardBtns(buttons){
+  return buttons.map(b=>{
+    const isSep=b.startsWith('(')||b.startsWith('→')||b==='×2'||b==='—';
+    return `<span class="${isSep?'btn-sep':'btn-pill'}">${b}</span>`;
+  }).join('');
+}
+
+function makeCard(item,section){
+  const hasNo=item.no&&item.no!=='';
+  const hasSkill=item.skill&&item.skill!=='—';
+  const noSkill=item.skill==='—';
+  const tags=[];
+  if(hasNo) tags.push('cuando');
+  if(hasSkill) tags.push('skill');
+  if(noSkill) tags.push('noskill');
+  const skillBadge=item.skill!==undefined?(hasSkill?`<span class="card-skill skill-req">Skill ${item.skill}</span>`:`<span class="card-skill skill-no">Sin skill</span>`):'';
+  const videoBadge=item.videoId?`<span class="card-skill" style="background:#0f2a1a;border:1px solid #22c55e;color:#86efac">▶ vídeo</span>`:'';
+  const btnsHtml=item.buttons&&item.buttons.length?`<div class="card-buttons">${cardBtns(item.buttons)}</div>`:'';
+  const searchable=[item.name,item.cuando||'',item.no||'',item.notas||'',item.situacion||'',item.como||'',item.skill||''].join(' ').toLowerCase();
+  return `<div class="card" data-section="${section}" data-tags="${tags.join(',')}" data-search="${searchable}" onclick='openPopup(${JSON.stringify(item)},"${section}")'>
+    <div class="card-top"><div class="card-name">${item.name}</div>${btnsHtml}</div>
+    <div class="card-meta"><span class="card-section-tag">${section}</span>${videoBadge}${skillBadge}<span class="card-arrow">›</span></div>
+  </div>`;
+}
+
+function render(){
+  Object.keys(DATA).forEach(section=>{
+    document.getElementById('cards-'+section).innerHTML=DATA[section].map(item=>makeCard(item,section)).join('');
+  });
+  applyFilters();
+}
+
+function openPopup(item,section){
+  document.getElementById('popupName').textContent=item.name;
+  document.getElementById('popupSection').textContent=section;
+  document.getElementById('popupButtons').innerHTML=item.buttons&&item.buttons.length?sepBtns(item.buttons,'popup'):'';
+  document.getElementById('popupButtons').style.display=item.buttons&&item.buttons.length?'':'none';
+
+  // Video
+  const videoEl=document.getElementById('popupVideo');
+  if(item.videoId&&item.videoStart!==undefined){
+    videoEl.innerHTML=`<div class="popup-video">
+      <div class="popup-video-label">Fuente · ${item.source||'Video'}</div>
+      <iframe src="https://www.youtube.com/embed/${item.videoId}?start=${item.videoStart}&rel=0" allowfullscreen></iframe>
+      <a class="popup-video-link" href="https://youtu.be/${item.videoId}?t=${item.videoStart}" target="_blank">↗ Abrir en YouTube</a>
+    </div>`;
+  } else {
+    videoEl.innerHTML=`<div class="popup-video">
+      <div class="popup-video-label">Fuente · ${item.source||'—'}</div>
+      <div class="popup-video-placeholder">📎 Sin vídeo enlazado aún</div>
+    </div>`;
+  }
+
+  const rows=[];
+  if(item.cuando) rows.push(`<div class="popup-row"><div class="popup-row-label">Cuándo</div><div class="popup-row-value">${item.cuando}</div></div>`);
+  if(item.situacion) rows.push(`<div class="popup-row"><div class="popup-row-label">Situación</div><div class="popup-row-value">${item.situacion}</div></div>`);
+  if(item.como) rows.push(`<div class="popup-row"><div class="popup-row-label">Cómo</div><div class="popup-row-value">${item.como}</div></div>`);
+  if(item.notas) rows.push(`<div class="popup-row"><div class="popup-row-label">Notas</div><div class="popup-row-value">${item.notas}</div></div>`);
+  if(item.no) rows.push(`<div class="popup-row"><div class="popup-row-label">Cuándo NO</div><div class="popup-row-value popup-no">${item.no}</div></div>`);
+  if(item.skill!==undefined){const sv=item.skill==='—'?'<span class="card-skill skill-no">Sin skill</span>':`<span class="card-skill skill-req">Skill ${item.skill}</span>`;rows.push(`<div class="popup-row"><div class="popup-row-label">Skills</div><div class="popup-row-value">${sv}</div></div>`);}
+  document.getElementById('popupBody').innerHTML=rows.join('');
+  document.getElementById('overlay').classList.add('open');
+}
+function closePopup(e){
+  if(e.target===document.getElementById('overlay')){
+    // stop iframe video on close
+    document.getElementById('popupVideo').innerHTML='';
+    document.getElementById('overlay').classList.remove('open');
+  }
+}
+function closePopupBtn(){
+  document.getElementById('popupVideo').innerHTML='';
+  document.getElementById('overlay').classList.remove('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('popupVideo').innerHTML='';
+    document.getElementById('overlay').classList.remove('open');
+  }
+});
+
+DATA.patrones=[
+  { name:'La Escalera (The Ladder)', buttons:[], cuando:'Siempre — es el patrón base de todo ataque', como:'Línea de ataque (horizontal): si el carril adelante está libre, pasa o conduce hacia delante. Línea segura (vertical): si el carril está cerrado, pasa o conduce hacia el lado hasta que se abra una opción hacia delante. Alternar entre las dos hasta llegar al área.', notas:'No necesitas regates ni habilidades especiales. La clave es leer si el carril está libre antes de decidir. Progresa eficientemente sin depender de la habilidad individual.', videoId:'16DXVdsLzJU', videoStart:57, source:'Deep Researcher FC' },
+  { name:'Central fuera de posición', buttons:[], cuando:'En cuanto veas que un central rival ha salido de su posición — reaccionar antes de que se recupere', como:'El central sale → el espacio detrás es tuyo. Los compañeros IA suelen reconocerlo solos y arrancan. Tu trabajo es dar el pase filtrado antes de que el central recupere.', notas:'Combinar con desmarque dirigido (L1 → RS) para guiar al atacante exactamente al espacio que dejó el central, no dejar que la IA elija el run.', videoId:'16DXVdsLzJU', videoStart:166, source:'Deep Researcher FC' },
+  { name:'Triángulo central', buttons:[], cuando:'Central rival bien posicionado — crear el espacio tú mismo', como:'En vez de mandar al delantero, desmarcar a un mediocampista (L1). Pasar el balón alrededor para darle tiempo de recorrer terreno. Cuando se acerque a la línea defensiva, filtrar el pase al espacio.', notas:'Los centrales rivales vigilan al delantero, no al medio que hace una llegada tardía. El run pasa desapercibido hasta que es demasiado tarde para pararlo.', videoId:'16DXVdsLzJU', videoStart:203, source:'Deep Researcher FC' },
+  { name:'Drive Wide', buttons:[], cuando:'Después de reciclar posesión o cambiar el juego de banda — extremo contrario algo más abierto de lo normal', como:'Al recibir el extremo en banda, no controlar hacia portería. Controlar el balón hacia fuera, en la misma dirección que ya venía viajando. El rival bloquea el ángulo de finesse → tú sales por fuera y le dejas atrás.', notas:'Funciona porque casi todo el mundo tiene miedo al disparo en rosca — su instinto es cerrar ese ángulo. Tú usas ese instinto contra él. Desde ahí puedes continuar, entrar al área o reabrir el ángulo de finesse desde mejor posición.', videoId:'16DXVdsLzJU', videoStart:260, source:'Deep Researcher FC' },
+  { name:'Laterales en el buildup', buttons:[], cuando:'Dos situaciones: salida de portería/saque de meta, o posesión con medio/extremo buscando ángulo', como:'Opción A (rápida): desmarcar el lateral del mismo lado del saque → mover el balón al lado contrario como distracción → cuando el lateral llega arriba, pase largo lobado hacia él. Opción B (paciente): desmarcar el lateral mientras el balón circula entre medio y extremo → no pasarle aún → circular hasta crear mejor ángulo → filtrar al espacio a su espalda.', notas:'Opción A: el rival mira el lado del balón, no el lateral que sube. Opción B: perfecta contra rivales agresivos que sacan al lateral de posición — el tuyo ataca justo el espacio que dejaron.', videoId:'16DXVdsLzJU', videoStart:319, source:'Deep Researcher FC' },
+  { name:'Send Wide (desmarque dirigido)', buttons:[], cuando:'Rival controla un central hacia atrás para seguir al delantero — se crea un hueco entre ese central y el lateral', como:'Desmarcar al delantero (L1). Cuando el rival arrastra al central para seguirle, usar el desmarque dirigido (L1 → RS) para redirigir al delantero al hueco entre central y lateral. Filtrar el pase.', notas:'El central controlado se mueve más rápido que los laterales IA — eso crea el pocket de espacio. Sin el desmarque dirigido, el delantero va al espacio central obvious; con él, ataca el gap entre defensas.', videoId:'16DXVdsLzJU', videoStart:393, source:'Deep Researcher FC' },
+  { name:'Opposite Switch Trigger', buttons:[], cuando:'Cambiando el juego de una banda a otra — extremo contrario algo más abierto de lo usual', como:'Antes de que el último medio reciba el balón en el cambio de orientación, desmarcar al extremo contrario (L1). En cuanto recibes, filtrar el pase al run del extremo. El lateral rival raramente está bien posicionado para recuperar.', notas:'Pro tips: usarlo más contra línea alta (más espacio a la espalda). Antes de cambiar, desmarcar primero un jugador del lado que atacas — eso arrastra a un defensa y deja al extremo contrario en mejor posición. Usar extremos Lengthy: su aceleración a larga distancia hace el patrón mucho más peligroso.', videoId:'16DXVdsLzJU', videoStart:468, source:'Deep Researcher FC' },
+  { name:'Triángulo ancho', buttons:[], cuando:'Extremo con run activo — no forzar el pase filtrado de inmediato', como:'Desmarcar al extremo (L1). En vez de filtrar directo, pasar primero al medio → luego al delantero. Esos dos pases dan tiempo al extremo de acercarse a la línea defensiva. Cuando el timing es correcto, filtrar el pase al run del extremo.', notas:'Los pases intermedios mejoran tanto el ángulo como el timing del pase final. Patrón simple pero muy consistente para entrar por banda a la espalda de la defensa.', videoId:'16DXVdsLzJU', videoStart:540, source:'Deep Researcher FC' },
+];
+
+function filterSection(section,btn){
+  activeSection=section;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function filterTag(tag,btn){
+  activeTag=tag;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function doSearch(){searchText=document.getElementById('searchInput').value.toLowerCase().trim();applyFilters();}
+function applyFilters(){
+  let anyVisible=false;
+  document.querySelectorAll('.section-wrap').forEach(sw=>{
+    const sec=sw.dataset.section;
+    const sectionMatch=activeSection==='all'||activeSection===sec;
+    let sectionHasVisible=false;
+    sw.querySelectorAll('.card').forEach(card=>{
+      const tagMatch=activeTag==='all'||card.dataset.tags.includes(activeTag);
+      const searchMatch=!searchText||card.dataset.search.includes(searchText);
+      const visible=sectionMatch&&tagMatch&&searchMatch;
+      card.style.display=visible?'':'none';
+      if(visible){sectionHasVisible=true;anyVisible=true;}
+    });
+    sw.classList.toggle('hidden',!sectionHasVisible);
+  });
+  document.getElementById('noResults').classList.toggle('visible',!anyVisible);
+}
+render();
+</script>
+</body>
+</html>
